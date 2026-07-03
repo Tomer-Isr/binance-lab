@@ -10,7 +10,9 @@ from psycopg2.extras import execute_values
 DB = os.environ["DATABASE_URL"]
 PAIRS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]
 TFS = {"1h": 720, "1d": 60}          # 1h: ~30 дней истории, 1d: ~60 дней контекста
-BASE = "https://api.binance.com/api/v3/klines"
+# data-api.binance.vision — публичный market-data эндпоинт Binance без гео-блокировки
+# (обычный api.binance.com отдаёт HTTP 451 с US-адресов, где крутится GitHub Actions)
+BASE = "https://data-api.binance.vision/api/v3/klines"
 
 DDL = """
 CREATE TABLE IF NOT EXISTS candles (
