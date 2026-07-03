@@ -1,0 +1,26 @@
+name: collect-candles
+
+# Автосбор свечей с Binance в Postgres на Railway.
+# Работает в облаке GitHub 24/7, независимо от домашнего ПК/NAS.
+on:
+  schedule:
+    - cron: "5 * * * *"      # каждый час в :05 (UTC)
+  workflow_dispatch: {}       # + возможность запустить вручную
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python collector.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
