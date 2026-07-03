@@ -11,8 +11,13 @@
 - [x] Схема БД: `candles(symbol, tf, open_time, o,h,l,c, volume, close_time, fetched_at)`, PK (symbol,tf,open_time)
 - [x] `collector.py`: тянет свечи с публичного Binance API, апсертит в Postgres
 - [x] Первая заливка истории: 3900 свечей, 5 пар × (1h×720 + 1d×60), проверено
-- [ ] Деплой воркером на Railway + cron (каждый час) — сейчас сбор ручной с ПК
-- **Критерий:** каждый час в БД свежие свечи без участия Томера
+- [x] Автосбор через **GitHub Actions** (`.github/workflows/collect.yml`, cron `5 * * * *`), пишет в Railway Postgres. Проверено: прогон success, база обновляется. Endpoint = data-api.binance.vision (обычный api.binance.com даёт 451 с US-раннеров).
+- **Критерий выполнен:** каждый час в БД свежие свечи без участия Томера ✅
+
+## Этап 2 — Анализ (без торговли) 🔶 идёт
+- [x] `analysis.py`: тренд/RSI/импульс/волатильность/позиция в диапазоне по 5 парам
+- [ ] Ежедневный разбор + накопление динамики (несколько дней)
+- [ ] (позже) дашборд equity/сравнение
 
 ## Этап 2 — Paper trading
 - [ ] Таблицы `paper_trades`, `paper_equity`
