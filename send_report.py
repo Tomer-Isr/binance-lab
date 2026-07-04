@@ -21,9 +21,13 @@ rows = cur.fetchall()
 # вчерашние ярлыки (если есть) для стрелок динамики
 cur.execute("SELECT symbol,label FROM verdicts WHERE snapshot_date=%s - INTERVAL '1 day'", (last,))
 prev = {s: l for s, l in cur.fetchall()}
+# день N наблюдений — сколько дней уже копится история
+cur.execute("SELECT count(DISTINCT snapshot_date) FROM verdicts")
+day_n = cur.fetchone()[0]
 conn.close()
 
-lines = [f"📊 <b>Разбор рынка</b> — {last}", "<i>пары к USDT, сортировка по недельному импульсу</i>", ""]
+lines = [f"📊 <b>Разбор рынка</b> — {last} · день {day_n} наблюдений",
+         "<i>пары к USDT, сортировка по недельному импульсу</i>", ""]
 for symbol, price, ch7, ch30, rsi, label, notes in rows:
     coin = symbol.replace("USDT", "")
     changed = ""
@@ -33,6 +37,15 @@ for symbol, price, ch7, ch30, rsi, label, notes in rows:
     lines.append(f"  ${price:,.2f} · неделя {ch7:+.1f}% · месяц {ch30:+.1f}% · RSI {rsi:.0f}")
     if notes and notes != "—":
         lines.append(f"  <i>{notes}</i>")
+    lines.append("")
+# раз в неделю — итог и напоминание, чтобы проект не забывался
+if day_n and day_n % 7 == 0 and rows:
+    best, worst = rows[0], rows[-1]
+    lines.append(f"📅 <b>Итог недели (день {day_n})</b>")
+    lines.append(f"Сильнейший — {best[0].replace('USDT','')} ({best[2]:+.1f}% за 7д), "
+                 f"слабейший — {worst[0].replace('USDT','')} ({worst[2]:+.1f}%).")
+    lines.append("Хочешь перейти к следующему этапу (виртуальная торговля на бумаге) — "
+                 "открой Claude Code и скажи: «продолжим binance-lab».")
     lines.append("")
 lines.append("<i>Это описание состояния рынка, не гарантия. Реальными деньгами пока не торгуем.</i>")
 msg = "\n".join(lines)
