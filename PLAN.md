@@ -17,8 +17,10 @@
 ## Этап 2 — Анализ (без торговли) ✅
 - [x] `analysis.py`: тренд/RSI/импульс/волатильность/позиция в диапазоне по 5 парам
 - [x] Снимки вердиктов в таблицу `verdicts` (динамика сигналов день к дню)
-- [x] `send_report.py`: отчёт в Telegram (пока через бота @ask_nutri_bot; при желании — отдельный бот, нужен только новый токен от BotFather)
-- [x] Автоматизация: cron-сервис `report` на Railway (образ python:3.12, ежедневно 06:00 UTC = 09:00 IL). При каждом запуске клонирует свежий main с GitHub — код обновляется обычным git push, привязка репо к Railway не нужна. (GH Actions для нового workflow не подошёл: у git-токена нет scope `workflow`; репо-линк Railway тоже не триггерился — GitHub-аппка не покрывает этот репо)
+- [x] `send_report.py`: отправка отчёта в Telegram (бот @binancetomerisr_bot, ручной запуск/резерв)
+- [x] Автоматизация — два слоя, чтобы не дублировать сообщения:
+  - **Слой данных:** cron-сервис `report` на Railway (образ python:3.12, 04:30 UTC = 07:30 IL) клонирует свежий main и запускает только `analysis.py` — снимок вердиктов в таблицу `verdicts` (динамика сигналов). Привязка репо к Railway не нужна: код обновляется обычным git push. (GH Actions для нового workflow не подошёл: у git-токена нет scope `workflow`)
+  - **Слой общения:** облачная Claude-routine `trig_019dQ1eVZdbFyRyRkMLfELmJ` (05:00 UTC = 08:00 IL) пишет человеческий разбор и шлёт через @binancetomerisr_bot (chat 719222925). Управление: https://claude.ai/code/routines/trig_019dQ1eVZdbFyRyRkMLfELmJ
 - [ ] (позже) дашборд equity/сравнение
 
 ## Этап 2 — Paper trading
