@@ -5,6 +5,9 @@ env: DATABASE_URL, TG_TOKEN, TG_CHAT
 import os, json, urllib.request, urllib.parse
 import psycopg2
 
+import palantir_signal
+palantir_signal.install_excepthook(component="send_report")
+
 DB = os.environ["DATABASE_URL"]
 TOKEN = os.environ["TG_TOKEN"]
 CHAT = os.environ["TG_CHAT"]

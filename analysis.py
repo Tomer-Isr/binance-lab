@@ -6,6 +6,9 @@
 import os, statistics, datetime
 import psycopg2
 
+import palantir_signal
+palantir_signal.install_excepthook(component="analysis")
+
 DB = os.environ["DATABASE_URL"]
 PAIRS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]
 

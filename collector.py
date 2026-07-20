@@ -7,6 +7,12 @@ import os, time, json, urllib.request
 import psycopg2
 from psycopg2.extras import execute_values
 
+# Падения уходят в контур «Сигналы» Палантира: раньше сборщик умирал молча
+# (Railway 12/15/18 июля, GH Actions 19-го), и узнавалось об этом окольным
+# путём — через письмо, которое разбирал mail-digest.
+import palantir_signal
+palantir_signal.install_excepthook(component="collector")
+
 DB = os.environ["DATABASE_URL"]
 PAIRS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]
 TFS = {"1h": 720, "1d": 60}          # 1h: ~30 дней истории, 1d: ~60 дней контекста

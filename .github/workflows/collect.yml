@@ -24,3 +24,6 @@ jobs:
       - run: python collector.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Падение сборщика уезжает в контур «Сигналы» Палантира.
+          PALANTIR_TOKEN: ${{ secrets.PALANTIR_TOKEN }}
+          PALANTIR_PRODUCT: binance-lab
