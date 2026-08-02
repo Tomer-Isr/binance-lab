@@ -30,17 +30,24 @@ def sma(v, n):
     return sum(v[-n:]) / n if len(v) >= n else None
 
 def rsi(closes, n=14):
+    """RSI со сглаживанием Уайлдера — так его считают биржи и TradingView.
+    Раньше здесь было простое среднее за 14 дней (Cutler's RSI): цифра расходилась
+    с любым внешним источником в среднем на 7 пунктов, доходило до 26."""
     if len(closes) < n + 1:
         return None
-    deltas = [closes[i+1] - closes[i] for i in range(len(closes)-1)][-n:]
-    gains = sum(d for d in deltas if d > 0) / n
-    losses = -sum(d for d in deltas if d < 0) / n
-    if losses == 0:
+    deltas = [closes[i+1] - closes[i] for i in range(len(closes)-1)]
+    gains = [max(d, 0) for d in deltas]
+    losses = [max(-d, 0) for d in deltas]
+    avg_gain = sum(gains[:n]) / n
+    avg_loss = sum(losses[:n]) / n
+    for i in range(n, len(deltas)):
+        avg_gain = (avg_gain * (n-1) + gains[i]) / n
+        avg_loss = (avg_loss * (n-1) + losses[i]) / n
+    if avg_loss == 0:
         return 100.0
-    rs = gains / losses
-    return 100 - 100 / (1 + rs)
+    return 100 - 100 / (1 + avg_gain / avg_loss)
 
-def verdict(price, s7, s30, r, pos, ch7):
+def verdict(price, s7, s30, r, pos):
     # тренд по средним
     if price > s7 > s30:
         trend = "растёт ↑"
@@ -79,8 +86,9 @@ results = []
 for sym in PAIRS:
     cur.execute("SELECT c FROM candles WHERE symbol=%s AND tf='1h' ORDER BY open_time", (sym,))
     h = [r[0] for r in cur.fetchall()]
-    cur.execute("SELECT c FROM candles WHERE symbol=%s AND tf='1d' ORDER BY open_time", (sym,))
-    d = [r[0] for r in cur.fetchall()]
+    cur.execute("SELECT h,l,c FROM candles WHERE symbol=%s AND tf='1d' ORDER BY open_time", (sym,))
+    days = cur.fetchall()
+    d = [r[2] for r in days]
     if not h or len(d) < 31:
         continue
     price = h[-1]
@@ -91,9 +99,12 @@ for sym in PAIRS:
     rets = [(d[i+1]/d[i]-1) for i in range(len(d)-1)][-30:]
     vol = statistics.pstdev(rets)*100
     r = rsi(d, 14)
-    lo, hi = min(d[-30:]), max(d[-30:])
+    # диапазон по настоящим максимумам/минимумам дня, а не по закрытиям:
+    # по закрытиям он уже реального, и цена постоянно оказывалась «у дна»
+    lo = min(x[1] for x in days[-30:])
+    hi = max(x[0] for x in days[-30:])
     pos = (price-lo)/(hi-lo)*100 if hi > lo else 50
-    tr, label, notes = verdict(price, s7, s30, r, pos, ch7)
+    tr, label, notes = verdict(price, s7, s30, r, pos)
     coin = sym.replace("USDT", "")
     results.append((coin, price, ch24, ch7, ch30, vol, r, pos, tr, label, notes))
 

@@ -27,6 +27,13 @@ prev = {s: l for s, l in cur.fetchall()}
 # день N наблюдений — сколько дней уже копится история
 cur.execute("SELECT count(DISTINCT snapshot_date) FROM verdicts")
 day_n = cur.fetchone()[0]
+# накопленная обратная связь (её собирает outcomes.py): что было ПОСЛЕ сигнала.
+# Показываем только ярлыки, по которым уже есть хоть какая-то выборка.
+cur.execute("SELECT label, count(*), avg(fwd7) FROM verdicts WHERE fwd7 IS NOT NULL "
+            "GROUP BY label HAVING count(*) >= 10 ORDER BY avg(fwd7) DESC")
+outcomes = cur.fetchall()
+cur.execute("SELECT count(*), avg(fwd7) FROM verdicts WHERE fwd7 IS NOT NULL")
+bench_n, bench_avg = cur.fetchone()
 conn.close()
 
 lines = [f"📊 <b>Разбор рынка</b> — {last} · день {day_n} наблюдений",
@@ -47,6 +54,13 @@ if day_n and day_n % 7 == 0 and rows:
     lines.append(f"📅 <b>Итог недели (день {day_n})</b>")
     lines.append(f"Сильнейший — {best[0].replace('USDT','')} ({best[2]:+.1f}% за 7д), "
                  f"слабейший — {worst[0].replace('USDT','')} ({worst[2]:+.1f}%).")
+    if outcomes:
+        lines.append("")
+        lines.append("<b>Что было после сигнала</b> — среднее изменение за 7 дней:")
+        for label, n, avg7 in outcomes:
+            lines.append(f"  {label} — {avg7:+.1f}% <i>(n={n})</i>")
+        lines.append(f"  <i>любой день без разбора — {bench_avg:+.1f}% (n={bench_n})</i>")
+        lines.append("<i>Ярлык чего-то стоит, только если устойчиво лучше последней строки.</i>")
     lines.append("Хочешь перейти к следующему этапу (виртуальная торговля на бумаге) — "
                  "открой Claude Code и скажи: «продолжим binance-lab».")
     lines.append("")
