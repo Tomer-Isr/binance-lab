@@ -1,9 +1,22 @@
 """binance-lab: собирает свежий разбор из таблицы вердиктов и шлёт в Telegram.
 Запуск после analysis.py (который кладёт свежий снимок в verdicts).
 env: DATABASE_URL, TG_TOKEN, TG_CHAT
+
+🔇 РАССЫЛКА ОТКЛЮЧЕНА 2026-08-03 по просьбе Томера: ежедневный отчёт приходил,
+но не читался («не вникаю, просто смахиваю») — а непрочитанное уведомление хуже,
+чем никакого: оно тренирует смахивать всё подряд, включая важное.
+Данные и разбор при этом продолжают копиться (analysis.py + outcomes.py),
+таблица `verdicts` растёт — вернуть рассылку = снять флаг ниже.
 """
 import os, json, urllib.request, urllib.parse
+import sys
+
 import psycopg2
+
+SEND_TELEGRAM = os.environ.get("SEND_TELEGRAM") == "1"
+if not SEND_TELEGRAM:
+    print("🔇 рассылка в Telegram отключена (SEND_TELEGRAM≠1) — данные уже собраны")
+    sys.exit(0)
 
 import palantir_signal
 palantir_signal.install_excepthook(component="send_report")
