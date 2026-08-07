@@ -4,8 +4,8 @@
 Это ОПИСАНИЕ состояния рынка, НЕ предсказание и НЕ гарантия.
 """
 import os, statistics, datetime
-import psycopg2
 
+import db
 import palantir_signal
 palantir_signal.install_excepthook(component="analysis")
 
@@ -77,7 +77,7 @@ def verdict(price, s7, s30, r, pos):
         label = "⚪ без чёткого направления"
     return trend, label, "; ".join(notes) if notes else "—"
 
-conn = psycopg2.connect(DB); cur = conn.cursor()
+conn = db.connect(DB); cur = conn.cursor()
 cur.execute(DDL_VERDICTS); conn.commit()
 print("=" * 78)
 print("РАЗБОР РЫНКА — состояние пар к USDT (данные из нашей базы)")

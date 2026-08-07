@@ -11,7 +11,7 @@ env: DATABASE_URL, TG_TOKEN, TG_CHAT
 import os, json, urllib.request, urllib.parse
 import sys
 
-import psycopg2
+import db
 
 SEND_TELEGRAM = os.environ.get("SEND_TELEGRAM") == "1"
 if not SEND_TELEGRAM:
@@ -25,7 +25,7 @@ DB = os.environ["DATABASE_URL"]
 TOKEN = os.environ["TG_TOKEN"]
 CHAT = os.environ["TG_CHAT"]
 
-conn = psycopg2.connect(DB); cur = conn.cursor()
+conn = db.connect(DB); cur = conn.cursor()
 # последний снимок + вчерашний label для показа динамики
 cur.execute("SELECT max(snapshot_date) FROM verdicts")
 last = cur.fetchone()[0]

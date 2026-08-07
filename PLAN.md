@@ -5,7 +5,8 @@
 ## Этап 0 — Скелет ✅
 - [x] Папка проекта, CLAUDE.md, PLAN.md
 - [x] git init + первый коммит
-- [x] Railway: проект `binance-lab` (917e1d80-399d-43fb-bf75-5fded3fce538) + Postgres (Online)
+- [x] Railway: проект `binance-lab` + Postgres (Online). Идентификаторы проекта и сервисов —
+  в кабинете Railway, в репозитории их нет (он публичный).
 
 ## Этап 1 — Collector 🔶 в процессе
 - [x] Схема БД: `candles(symbol, tf, open_time, o,h,l,c, volume, close_time, fetched_at)`, PK (symbol,tf,open_time)
@@ -17,9 +18,9 @@
 ## Этап 2 — Анализ (без торговли) ✅
 - [x] `analysis.py`: тренд/RSI/импульс/волатильность/позиция в диапазоне по 5 парам
 - [x] Снимки вердиктов в таблицу `verdicts` (динамика сигналов день к дню)
-- [x] `send_report.py`: отправка отчёта в Telegram (бот @binancetomerisr_bot, ручной запуск/резерв)
-- [x] Автоматизация: cron-сервис `report` на Railway (образ python:3.12, 05:00 UTC = 08:00 IL) клонирует свежий main и запускает `analysis.py` (снимок в `verdicts`) + `send_report.py` (отчёт в Telegram через @binancetomerisr_bot, chat 719222925). В отчёте: день N наблюдений, динамика «изменилось со вчера», раз в 7 дней — итог недели с напоминанием про следующий этап. Код обновляется обычным git push.
-- [x] ⚠️ Облачная Claude-routine `trig_019dQ1eVZdbFyRyRkMLfELmJ` — НА ПАУЗЕ: окружение cloud-routine блокирует egress (TCP к Railway Postgres и HTTPS к api.telegram.org → 403), оба её запуска 04.07 упали. Ни один «отчёт от routine» реально не доставлялся. Вернуться, если Anthropic откроет сетевую политику. (GH Actions для нового workflow тоже не подошёл: у git-токена нет scope `workflow`)
+- [x] `send_report.py`: отправка отчёта в Telegram (ручной запуск/резерв). Бот и получатель — в переменных `TG_TOKEN`/`TG_CHAT`, в репозитории их нет.
+- [x] Автоматизация: cron-сервис `report` на Railway (образ python:3.12, 05:00 UTC = 08:00 IL) клонирует свежий main и запускает `analysis.py` (снимок в `verdicts`) + `send_report.py` (отчёт в Telegram). В отчёте: день N наблюдений, динамика «изменилось со вчера», раз в 7 дней — итог недели с напоминанием про следующий этап. Код обновляется обычным git push.
+- [x] ⚠️ Облачная Claude-routine (id — в кабинете, не здесь) — НА ПАУЗЕ: окружение cloud-routine блокирует egress (TCP к Railway Postgres и HTTPS к api.telegram.org → 403), оба её запуска 04.07 упали. Ни один «отчёт от routine» реально не доставлялся. Вернуться, если Anthropic откроет сетевую политику. (GH Actions для нового workflow тоже не подошёл: у git-токена нет scope `workflow`)
 - [x] **[02.08] Аналитика проверена на истории и починена.** Реконструкция ярлыков за 60 дней ×
   5 пар показала: 🟢 «импульс вверх» предшествовал −0.64% за неделю против +0.67% у простого
   «держать»; 🟡 «перепродан» с виду давал +5.68%, но это два синхронных отскока рынка

@@ -4,8 +4,9 @@
 На Railway: DATABASE_URL инжектится автоматически, запуск по cron (каждый час).
 """
 import os, time, json, urllib.request
-import psycopg2
 from psycopg2.extras import execute_values
+
+import db
 
 # Падения уходят в контур «Сигналы» Палантира: раньше сборщик умирал молча
 # (Railway 12/15/18 июля, GH Actions 19-го), и узнавалось об этом окольным
@@ -40,7 +41,7 @@ def fetch(symbol, interval, limit):
         return json.load(r)
 
 def main():
-    conn = psycopg2.connect(DB); conn.autocommit = True
+    conn = db.connect(DB); conn.autocommit = True
     cur = conn.cursor()
     cur.execute(DDL)
     for sym in PAIRS:
