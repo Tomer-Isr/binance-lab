@@ -8,8 +8,8 @@
 станет видно, отличается ли «импульс вверх» от «просто держать», или это украшение.
 """
 import os, datetime, statistics, collections
-import psycopg2
 
+import db
 import palantir_signal
 palantir_signal.install_excepthook(component="outcomes")
 
@@ -40,7 +40,7 @@ def price_at(cur, symbol, moment):
     return row[1]
 
 
-conn = psycopg2.connect(DB)
+conn = db.connect(DB)
 cur = conn.cursor()
 cur.execute(DDL)
 conn.commit()
