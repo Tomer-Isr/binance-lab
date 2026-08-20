@@ -27,6 +27,9 @@ jobs:
       - run: python collector.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          # Падение сборщика уезжает в контур «Сигналы» Палантира.
+          # Падение сборщика уезжает в контур «Сигналы» Депо. Ключ узкий: он даёт
+          # право положить строку в журнал сигналов и больше ничего. PALANTIR_TOKEN
+          # оставлен запасным на время переезда — дверь пока принимает оба.
+          PALANTIR_SIGNAL_TOKEN: ${{ secrets.PALANTIR_SIGNAL_TOKEN }}
           PALANTIR_TOKEN: ${{ secrets.PALANTIR_TOKEN }}
           PALANTIR_PRODUCT: binance-lab

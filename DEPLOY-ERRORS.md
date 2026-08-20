@@ -26,3 +26,7 @@ Crashed». Когда контейнер поднимается с чистой 
 Исправлено: клон в отдельную папку с очисткой перед ним (`rm -rf /src && git clone ... /src`).
 Команда живёт в настройках сервиса на Railway, не в репозитории — правилась через API
 (`serviceInstanceUpdate`), в git её нет.
+
+- [2026-08-06] GitHub Actions `collect-candles` (main, commit e1ddce0) — Run failed, job `collect`
+  cancelled (1 annotation), длился 15 мин 32 сек до отмены. Второй сбой этого workflow (первый —
+  18.07, все job упали за 14 сек — другой характер). Ссылка на письмо: https://mail.google.com/mail/u/0/#inbox/19fd847fd558c73b
